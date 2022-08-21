@@ -354,8 +354,8 @@ if __name__=='__main__':
 
 
     #######################  导出周运封图   #######################
-    p=WeekYunCover(work_dir='D:\\工作目录\\ejj')
-    p.export(prd=['20220822','20220828'],save_dir='e:\\temp\\ejj\\日穿搭\\0-每周运势封图')
+    # p=WeekYunCover(work_dir='D:\\工作目录\\ejj')
+    # p.export(prd=['20220822','20220828'],save_dir='e:\\temp\\ejj\\日穿搭\\0-每周运势封图')
 
 
 
