@@ -306,7 +306,7 @@ class ExportWeekYunTxt(WeekYun):
         
         return all_txt
     
-    def all_date_wx(self,prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx'):
+    def all_date_wx(self,prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭'):
         stime,etime=datetime.strptime(prd[0],'%Y%m%d'),datetime.strptime(prd[1],'%Y%m%d')
         datelist=[]
         while stime<=etime:
@@ -315,7 +315,7 @@ class ExportWeekYunTxt(WeekYun):
         
         for nowtime in datelist:
             print('正在处理 '+nowtime[:4]+'-'+nowtime[4:6]+'-'+nowtime[6:]+' 穿搭配色文案')
-            self.all_wx_txt(date_input=nowtime,xls=xls)
+            self.all_wx_txt(date_input=nowtime,xls=xls,save=save,save_dir=save_dir)
         
         print('完成')
 
@@ -350,7 +350,7 @@ if __name__=='__main__':
     #######################  导出一周日穿搭文案   #######################
     # p=ExportWeekYunTxt()
     # p.all_wx_txt(date_input='20220822',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭')
-    # p.all_date_wx(prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    # p.all_date_wx(prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭')
 
 
     #######################  导出周运封图   #######################
