@@ -152,12 +152,16 @@ class ExportImage(WeekYun):
         weekay='星期'+infos['星期'].tolist()[0]
         date_txt=datetime.strftime(infos['日期'].tolist()[0],'%Y年%m月%d日')
         date_gz=infos['日期干支'].tolist()[0]
-        color_txt=infos['颜色标签'].tolist()[0]
-        
+        color_txt=infos['颜色标签'].tolist()[0]       
 
         
-        #饰品名字文字
+        #饰品
+        #如饰品数>3，则随机选出3个
         decs=infos['饰品图地址'].tolist()[0].split(',')
+        if len(decs)>3:
+            decs=random.sample(decs,3)
+
+        #饰品名字文字
         dec_txts=[]
         for dec in decs:
             dec_txt=''
@@ -179,9 +183,11 @@ class ExportImage(WeekYun):
         img_color=img_color.resize((298,43))
         
         bg_img.paste(img_color,(x_colorblock,y_colorblock))
-        
+
+       #饰品图 
         x_dec,y_dec,dec_gap=270,454,50
         x_dec_txt_init=copy.deepcopy(x_dec)
+        
         for dec_url in dec_urls:            
             img_dec=Image.open(dec_url)            
             img_dec=img_dec.resize((80,80))
@@ -342,8 +348,8 @@ class WeekYunCover(ExportImage):
 
 if __name__=='__main__':
     #######################  一周日穿搭配色文案 + 周运封图   #######################
-    week_txts=ExportWeekYunTxt(work_dir='d:\\工作目录\\ejj')
-    p.all_date_wx(prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    # week_txts=ExportWeekYunTxt(work_dir='d:\\工作目录\\ejj')
+    # p.all_date_wx(prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
 
 
 
@@ -366,10 +372,10 @@ if __name__=='__main__':
     # print(df)
 
 
-    # p=ExportImage()
+    p=ExportImage()
     # res=p.draw_img(date_input='20220828',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
     # res.show()
-    # p.batch_deal(prd=['20220822','20220828'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    p.batch_deal(prd=['20220910','20220913'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
 
 
     
