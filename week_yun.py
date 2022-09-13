@@ -142,7 +142,7 @@ class ExportImage(WeekYun):
         img=Image.open(os.path.join(self.work_dir,'素材','穿搭底图',wx+'.jpg'))
         return img
 
-    def draw_img(self,date_input='20220822',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx'):
+    def draw_img(self,date_input='20220822',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',exp_txt='no'):
         bg_img=self.back_img(wx=wx)
         infos=self.wuxing(date_input=date_input,wx=wx,xls=xls)
         # print(infos.columns)
@@ -155,20 +155,38 @@ class ExportImage(WeekYun):
         color_txt=infos['颜色标签'].tolist()[0]       
 
         
-        #饰品
+        #饰品      
+
+        #随机打乱顺序
+        _decs=infos['饰品图地址'].tolist()[0].split(',')
+        random.shuffle(_decs)
+        
+        #去重，去类型相同的饰品，如手镯，只有一个
+        decs_drop_dup=[]
+        type_dup_list=[]
+        for _pre_decs in _decs:
+            if _pre_decs.split('_')[2] not in type_dup_list:
+                decs_drop_dup.append(_pre_decs)
+                type_dup_list.append(_pre_decs.split('_')[2])
+
         #如饰品数>3，则随机选出3个
-        decs=infos['饰品图地址'].tolist()[0].split(',')
-        if len(decs)>3:
-            decs=random.sample(decs,3)
+        if len(decs_drop_dup)>3:
+            decs=random.sample(decs_drop_dup,3)
+        else:
+            decs=decs_drop_dup
 
         #饰品名字文字
         dec_txts=[]
+        dec_txt_out_list=[]
         for dec in decs:
             dec_txt=''
             _dec_t=dec.split('\\')[-1].split('_')
             dec_txt+=_dec_t[1]+_dec_t[2]
             dec_txts.append([dec_txt,_dec_t[0]])
-
+            dec_txt_out_list.append(dec_txt)
+        
+        #输出到文本的饰品描述内容
+        dec_txt_out='、'.join(dec_txt_out_list)
 
         #url
         color_url=infos['颜色图地址'].tolist()[0]
@@ -217,7 +235,7 @@ class ExportImage(WeekYun):
         x_colortxt,y_colortxt=x_colorblock+img_color.size[0]//2-(len(color_txt)*ft_size_colortxt)//2,y_colorblock+80
         draw.text((x_colortxt,y_colortxt),color_txt,font=self.font('华康海报体W12(P)',ft_size_colortxt),fill='#9E9E9D')
 
-        return bg_img
+        return bg_img,dec_txt_out
 
     def batch_deal(self,prd=['20220822','20220828'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx'):
         stime,etime=datetime.strptime(prd[0],'%Y%m%d'),datetime.strptime(prd[1],'%Y%m%d')
@@ -226,6 +244,7 @@ class ExportImage(WeekYun):
             datelist.append(stime.strftime('%Y%m%d'))
             stime+=timedelta(days=1)
         
+        out_decs_txt=Vividict()
         for nowtime in datelist:
             date_dir=nowtime[:4]+'-'+nowtime[4:6]+'-'+nowtime[6:]
             save_dir=os.path.join(out_put_dir,date_dir)
@@ -233,12 +252,20 @@ class ExportImage(WeekYun):
                 os.makedirs(save_dir)
             for num,wx in enumerate(['木','火','土','金','水']):
                 print('正在生成 '+date_dir+' '+wx+'  穿搭')
-                res_img=self.draw_img(date_input=nowtime,wx=wx,xls=xls)
+                res_img,dec_txt=self.draw_img(date_input=nowtime,wx=wx,xls=xls)
                 save_name=os.path.join(save_dir,str(num+1)+'-'+wx+'.jpg')
                 res_img.save(save_name,quality=95,subsampling=0)
+                out_decs_txt[nowtime][wx]=dec_txt
+
         print('完成')
 
+        return out_decs_txt
+
 class ExportWeekYunTxt(WeekYun):
+    def __init__(self,work_dir='D:\\工作目录\\ejj',import_dec_dic=''):
+        super(ExportWeekYunTxt,self).__init__(work_dir=work_dir)
+        self.import_dec_dic=import_dec_dic
+
     def wx_icon(self,wx='木'):
         wxchr_list={
             "木":"🌳",
@@ -261,21 +288,27 @@ class ExportWeekYunTxt(WeekYun):
             clr_txt='建议穿'+clrs[0]+'、'+clrs[1]+'衣服，'
         else:
             clr_txt='建议穿'+'、'.join(clrs[:-1])+'以及'+clrs[-1]+'衣服，'
+
+        
         
         #佩戴饰品语句dec_txt
-        decs=infos['饰品图地址'].tolist()[0].split(',')
-        dec_names=[x.split('\\')[-1].split('_')[1]+x.split('\\')[-1].split('_')[2] for x in decs]
-        for dec_name in dec_names:
-            if len(dec_names)==1:
-                dec_txt='佩戴'+dec_names[0]+'等饰品。'
-            elif len(dec_names)==2:
-                dec_txt='佩戴'+dec_names[0]+'及'+dec_names[1]+'等饰品。'
-            else:
-                dec_txt='佩戴'+'、'.join(dec_names[:-1])+'以及'+clrs[-1]+'等饰品。'
-
+        #无饰品语句导入
+        # print('self.import dec dic',self.import_dec_dic)
+        if self.import_dec_dic=='':
+            decs=infos['饰品图地址'].tolist()[0].split(',')
+            dec_names=[x.split('\\')[-1].split('_')[1]+x.split('\\')[-1].split('_')[2] for x in decs]
+            for dec_name in dec_names:
+                if len(dec_names)==1:
+                    dec_txt='佩戴'+dec_names[0]+'等饰品。'
+                elif len(dec_names)==2:
+                    dec_txt='佩戴'+dec_names[0]+'及'+dec_names[1]+'等饰品。'
+                else:
+                    dec_txt='佩戴'+'、'.join(dec_names[:-1])+'以及'+clrs[-1]+'的饰品。'
+        #有饰品语句导入
+        else:
+            dec_txt='佩戴'+self.import_dec_dic[date_input][wx]+'以及'+clrs[-1]+'的饰品。'
          
-
-
+            
         daycmt=self.day_cmt(date_input=date_input,xls=xls)
         df=pd.DataFrame()        
         df['日期']=daycmt['日期']
@@ -292,8 +325,7 @@ class ExportWeekYunTxt(WeekYun):
 
         return [title,wxtxt]
 
-    def all_wx_txt(self,date_input='20220822',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭'):
-        
+    def all_wx_txt(self,date_input='20220822',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭'):        
         all_txt=''
         for wx in ['木','火','土','金','水']:
             txts=self.exp_txt(date_input=date_input,wx=wx,xls=xls)
@@ -312,7 +344,7 @@ class ExportWeekYunTxt(WeekYun):
         
         return all_txt
     
-    def all_date_wx(self,prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭'):
+    def all_date_wx(self,prd=['20220822','20220828'],xls='d:\\工作目录\\ejj\\运势\\运势.xlsx',save='yes',save_dir='e:\\temp\\ejj\\日穿搭',import_dec_dic=''):
         stime,etime=datetime.strptime(prd[0],'%Y%m%d'),datetime.strptime(prd[1],'%Y%m%d')
         datelist=[]
         while stime<=etime:
@@ -345,6 +377,10 @@ class WeekYunCover(ExportImage):
 
         print('完成')
 
+class Vividict(dict):
+    def __missing__(self, key):
+        value = self[key] = type(self)()
+        return value
 
 if __name__=='__main__':
     #######################  一周日穿搭配色文案 + 周运封图   #######################
@@ -375,7 +411,9 @@ if __name__=='__main__':
     p=ExportImage()
     # res=p.draw_img(date_input='20220828',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
     # res.show()
-    p.batch_deal(prd=['20220910','20220913'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    res=p.batch_deal(prd=['20220912','20220913'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    print(res)
+  
 
 
     
