@@ -87,6 +87,10 @@ class WeekYun:
                 clr='蓝'
             if clr=='金':
                 clr='白'
+            if clr=='粉':
+                clr='红'
+            if clr=='紫':
+                clr='红'
             dec_wxs=dec_txt[dec_txt['颜色']==clr].sample(1)['五行属性'].tolist()[0]
             if dec_wxs not in decs:
                 decs.append(dec_wxs)
