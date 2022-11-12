@@ -52,17 +52,21 @@ class WeekYun:
         df['五行']=wx
 
         #色系图地址
+        # print(df['颜色'].tolist()[0])
+        # print(map(sorted,df['颜色'].tolist()[0]))
         color_list=[]
         for color in os.listdir(os.path.join(self.work_dir,'素材','色系图')):
             if color[-3:].lower()=='png':
                 clr_name=color.split('_')[0]
+                # if ''.join(sorted(clr_name))==list(map(sorted,df['颜色'].tolist()[0]))
                 if ''.join(sorted(clr_name))==df['颜色'].tolist()[0]:
                     color_list.append(color)
         
         try:
             _pick_color=random.choice(color_list)
         except IndexError:
-            print(df['颜色'].tolist()[0]+':目录中没有对应的色系图片')
+            print(color_list)
+            print(df['颜色'].tolist()[0]+':目录中没有对应的色系图片'+'\n')
             exit(0)
         pick_color=os.path.join(self.work_dir,'素材','色系图',_pick_color)
         df['颜色图地址']=pick_color
@@ -93,6 +97,8 @@ class WeekYun:
                 clr='红'
             if clr=='棕':
                 clr='黄'
+            if clr=='粉红':
+                clr='红'
             dec_wxs=dec_txt[dec_txt['颜色']==clr].sample(1)['五行属性'].tolist()[0]
             if dec_wxs not in decs:
                 decs.append(dec_wxs)
@@ -415,10 +421,10 @@ if __name__=='__main__':
 
 
     p=ExportImage()
-    # res=p.draw_img(date_input='20220828',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
-    # res.show()
+    res=p.draw_img(date_input='20220828',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
+    res.show()
     res=p.batch_deal(prd=['20220912','20220913'],out_put_dir='e:\\temp\\ejj\日穿搭',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx')
-    print(res)
+    # print(res)
   
 
 

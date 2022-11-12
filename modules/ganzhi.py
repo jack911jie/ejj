@@ -27,10 +27,10 @@ class GanZhi:
             # print(self.dic)
 
     
-    def inputdate(self,y,m,d,h=-1,zishi=0):
+    def inputdate(self,y,m,d,h=0,zishi=0):
         self.jqlist=self.dic[str(y)]
         
-        ymd=str(y)+"-"+ str(m)+ '-' +str(d)
+        ymd=str(y)+"-"+ str(m)+ '-' +str(d)+'-'+str(h)
         self.jqdate=[]
         for i in self.jqnames:
             ptn=r'\d+年.+日'
@@ -47,12 +47,12 @@ class GanZhi:
             i[1]=i[1].replace('年','-').replace('月','-')[0:-1]
             
         
-        input_time=datetime.strptime(ymd, '%Y-%m-%d')
+        input_time=datetime.strptime(ymd, '%Y-%m-%d-%H')
         self.jq_section=[]
         n=0
 
         for i in self.jqdate:
-            list_time=datetime.strptime(i[1], '%Y-%m-%d')
+            list_time=datetime.strptime(i[1]+'-'+i[2][0:2], '%Y-%m-%d-%H')
             if list_time>input_time:
                 self.jq_section.append(n-1)
                 self.jq_section.append(self.jqdate[n-1][0])
@@ -83,8 +83,18 @@ class GanZhi:
         
         return self.jq_section
 
-    def cal_dateGZ(self,y,m,d,h=-1,zishi=0):
+    def cal_dateGZ(self,y,m,d,h=-1,min=0,zishi=0,real_sun_time='no',longtitude=120):
         
+        if real_sun_time=='yes':
+            new_time=self.real_sun_time_transfer(y,m,d,h,min,long=longtitude)
+            y=int(new_time.year)
+            m=int(new_time.month)
+            d=int(new_time.day)
+            h=int(new_time.hour)
+            min=int(new_time.minute)
+
+            res_real_sun_time=new_time.strftime('%Y-%m-%d %H:%M')
+            print('真太阳时：',res_real_sun_time)
         
         
         # 因为23-0点涉及日期变动，先按输入参数校正
@@ -97,7 +107,7 @@ class GanZhi:
             m=int(date_correct.strftime('%m'))
             d=int(date_correct.strftime('%d'))     
             
-        dateGZ=self.inputdate(y,m,d)
+        dateGZ=self.inputdate(y,m,d,h)
         
         logger.info(['按子时校正后的日期：',y,m,d])
         
@@ -222,11 +232,25 @@ class GanZhi:
         d2=datetime.strptime(o,'%Y-%m-%d')
         return (d1-d2).days
           
+    def real_sun_time_transfer(self,y,m,d,h,min,long=120):
+        old=datetime.strptime(str(y)+'-'+str(m)+'-'+str(d)+'-'+str(h)+'-'+str(min),'%Y-%m-%d-%H-%M')
+        long_delta=(int(long)-120)*4*60
 
+        if long_delta==abs(long_delta):
+            new_time=old+timedelta(seconds=abs(long_delta))
+        else:
+            new_time=old-timedelta(seconds=abs(long_delta))
+
+        return new_time
 
 if __name__=='__main__':
     mybz=GanZhi()
     
-    k=mybz.cal_dateGZ(1975,2,14)
+    k=mybz.cal_dateGZ(1984,10,24,23,48,zishi=0,real_sun_time='yes',longtitude=108)
+
+    # zishi==0, 23-0点按下一天的子时处理，默认
+    # zishi==1, 23-0点按当天的子时处理
+
+    # k=mybz.real_sun_time_transfer(1980,5,23,2,10,108)
     
     print(k)
