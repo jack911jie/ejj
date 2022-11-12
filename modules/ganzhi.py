@@ -94,9 +94,12 @@ class GanZhi:
             d=int(new_time.day)
             h=int(new_time.hour)
             min=int(new_time.minute)
+            
 
             res_real_sun_time=new_time.strftime('%Y-%m-%d %H:%M')
             # print('真太阳时：',res_real_sun_time)
+        else:
+            res_real_sun_time='not calculate'
         
         
         # 因为23-0点涉及日期变动，先按输入参数校正
