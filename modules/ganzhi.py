@@ -84,6 +84,8 @@ class GanZhi:
         return self.jq_section
 
     def cal_dateGZ(self,y,m,d,h=-1,min=0,zishi=0,real_sun_time='no',longtitude=120):
+
+        txt_input_time=str(y)+'-'+str(m)+'-'+str(d)+' '+str(h).zfill(2)+':'+str(min).zfill(2)
         
         if real_sun_time=='yes':
             new_time=self.real_sun_time_transfer(y,m,d,h,min,long=longtitude)
@@ -94,7 +96,7 @@ class GanZhi:
             min=int(new_time.minute)
 
             res_real_sun_time=new_time.strftime('%Y-%m-%d %H:%M')
-            print('真太阳时：',res_real_sun_time)
+            # print('真太阳时：',res_real_sun_time)
         
         
         # 因为23-0点涉及日期变动，先按输入参数校正
@@ -199,7 +201,9 @@ class GanZhi:
         logger.debug(['输出结果:',res])
         logger.debug('----------------------------')
 #         print(res)
-        return res
+
+        
+        return {'bazhi':res,'input_time':txt_input_time,'real_sun_time':res_real_sun_time}
 
     def gzodr(self,n,j): #校准超过10或12,或负数的天干地支序数
         if j=='g':
