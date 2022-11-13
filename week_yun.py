@@ -34,7 +34,7 @@ class WeekYun:
     def day_cmt(self,date_input='20220822',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx'):
         df_cmt=self.read_day_cmt(xls=xls)
         day_cmt=df_cmt[df_cmt['日期']==datetime.strptime(date_input,'%Y%m%d')].copy(deep=True)
-        dategz=ganzhi.GanZhi().cal_dateGZ(int(date_input[:4]),int(date_input[4:6]),int(date_input[6:]))
+        dategz=ganzhi.GanZhi().cal_dateGZ(int(date_input[:4]),int(date_input[4:6]),int(date_input[6:]),8,0)
         gz=''.join(dategz)
         day_cmt['日期干支']=gz[:2]+'年'+gz[2:4]+'月'+gz[4:]+'日'
         return day_cmt
