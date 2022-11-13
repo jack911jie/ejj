@@ -206,7 +206,7 @@ class GanZhi:
 #         print(res)
 
         
-        return {'bazhi':res,'input_time':txt_input_time,'real_sun_time':res_real_sun_time}
+        return {'bazi':res,'input_time':txt_input_time,'real_sun_time':res_real_sun_time}
 
     def gzodr(self,n,j): #校准超过10或12,或负数的天干地支序数
         if j=='g':
