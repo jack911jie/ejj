@@ -36,7 +36,7 @@ class WeekYun:
         day_cmt=df_cmt[df_cmt['日期']==datetime.strptime(date_input,'%Y%m%d')].copy(deep=True)
         dategz=ganzhi.GanZhi().cal_dateGZ(int(date_input[:4]),int(date_input[4:6]),int(date_input[6:]),8,0)['bazi']
         gz=''.join(dategz)
-        day_cmt['日期干支']=gz[:2]+'年'+gz[2:4]+'月'+gz[4:]+'日'
+        day_cmt['日期干支']=gz[:2]+'年'+gz[2:4]+'月'+gz[4:6]+'日'
         return day_cmt
 
     def wuxing(self,date_input='20220822',wx='木',xls='d:\\工作目录\\ejj\\运势\\运势.xlsx'):
