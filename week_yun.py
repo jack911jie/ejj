@@ -46,7 +46,7 @@ class WeekYun:
         df['日期']=daycmt['日期']
         df['星期']=daycmt['星期']
         df['日期干支']=daycmt['日期干支']
-        df['颜色']=daycmt[wx+'颜色'].str.replace(r'[，,]','',regex=True)
+        df['颜色']=daycmt[wx+'颜色'].str.replace(r'[，,、]','',regex=True)
         df['颜色']=df['颜色'].apply(lambda x:''.join(sorted(x)))
         df['描述']=daycmt[wx+'描述']
         df['五行']=wx
